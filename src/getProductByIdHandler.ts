@@ -1,6 +1,5 @@
 import {APIGatewayProxyHandler} from "aws-lambda";
-import {getMockProductItemById$} from "../utils/mock-data";
-
+import {getMockProductItemById$} from "../utils/helpers";
 
 
 export const getProductById: APIGatewayProxyHandler = async (event) => {
