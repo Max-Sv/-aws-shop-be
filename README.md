@@ -9,6 +9,7 @@ endpoints:
 Mock data for testing: ./utils/mock-data.ts
 
 link on for FE PR: https://github.com/Max-Sv/shop-angular-cloudfront/pull/2/files
+link on FE: https://d2sqr7ze13s3vc.cloudfront.net/
 
 ### Example: 
 
