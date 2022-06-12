@@ -93,7 +93,7 @@ export function getMockProductItemById$(id: string): Promise<MockProductItem> | 
             if (item) {
                 resolve(mockProductItems.find(item => item.id === id));
             } else {
-                reject(new Error("Item not found"))
+                reject(new Error("Product not found"))
             }
         }, 0);
     });
