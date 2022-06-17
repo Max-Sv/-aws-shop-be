@@ -13,7 +13,7 @@ link on FE: https://d2sqr7ze13s3vc.cloudfront.net/
 
 ### Example: 
 
-get: https://nb4n80eqq2.execute-api.eu-west-1.amazonaws.com/dev/products/7567ec4b-b10c-48c5-9445-fc73c48a80a2
+get: https://0rzafcr3yh.execute-api.eu-west-1.amazonaws.com/dev/products/7567ec4b-b10c-48c5-9445-fc73c48a80a2
 
 should return : {
 "count": 2,
