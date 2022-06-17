@@ -3,8 +3,8 @@
 ## For task-3:
 
 endpoints:
-- GET - https://e6ngy3cftk.execute-api.eu-west-1.amazonaws.com/dev/products
-- GET - https://e6ngy3cftk.execute-api.eu-west-1.amazonaws.com/dev/products/{productId}
+- GET - https://0rzafcr3yh.execute-api.eu-west-1.amazonaws.com/dev/products
+- GET - https://0rzafcr3yh.execute-api.eu-west-1.amazonaws.com/dev/products/{productId}
 
 Mock data for testing: ./utils/mock-data.ts
 
