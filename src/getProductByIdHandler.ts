@@ -6,10 +6,17 @@ export const getProductById: APIGatewayProxyHandler = async (event) => {
     const param = event.pathParameters;
 
     if (param) {
-        const item = await getMockProductItemById$(param.productId as string);
-        return {
-            statusCode: 200,
-            body: JSON.stringify(item)
+        try {
+            const item = await getMockProductItemById$(param.productId as string);
+            return {
+                statusCode: 200,
+                body: JSON.stringify(item)
+            }
+        } catch (e) {
+            return {
+                statusCode: 404,
+                body: JSON.stringify(e.message)
+            }
         }
     }
 
