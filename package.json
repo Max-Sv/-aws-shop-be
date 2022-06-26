@@ -20,6 +20,10 @@
   },
   "dependencies": {
     "@types/aws-lambda": "^8.10.100",
-    "aws-lambda": "^1.0.7"
+    "@types/lodash": "^4.14.182",
+    "@types/pg": "^8.6.5",
+    "aws-lambda": "^1.0.7",
+    "pg": "^8.7.3",
+    "webpack-node-externals": "^3.0.0"
   }
 }

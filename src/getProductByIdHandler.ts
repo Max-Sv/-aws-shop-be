@@ -1,16 +1,20 @@
-import {APIGatewayProxyHandler} from "aws-lambda";
-import {getMockProductItemById$} from "../utils/helpers";
+import {APIGatewayProxyEvent, APIGatewayProxyHandler} from "aws-lambda";
+import { Client, ClientConfig } from "pg";
 
 
-export const getProductById: APIGatewayProxyHandler = async (event) => {
+export const getProductById: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent) => {
     const param = event.pathParameters;
+    const client = new Client(dbOptions);
+    await client.connect();
 
     if (param) {
         try {
-            const item = await getMockProductItemById$(param.productId as string);
+            const { rows: product } = await client.query(`SELECT * FROM products WHERE id='${param.productId}'`)
+            console.log("=>(getProductByIdHandler.ts:26) product", product);
+
             return {
                 statusCode: 200,
-                body: JSON.stringify(item),
+                body: JSON.stringify(product),
                 headers: {
                     "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
@@ -19,7 +23,7 @@ export const getProductById: APIGatewayProxyHandler = async (event) => {
             }
         } catch (e) {
             return {
-                statusCode: 404,
+                statusCode: 500,
                 body: JSON.stringify(e.message),
                 headers: {
                     "Access-Control-Allow-Headers" : "Content-Type",

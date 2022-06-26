@@ -29,8 +29,11 @@ package:
 custom:
   webpack: # serverless-webpack plugin options
     webpackConfig: webpack.config.js # Name of webpack configuration file
-    includeModules: true # Node modules configuration for packaging
+    includeModules:
+      forceInclude:
+        - pg
     packager: 'yarn' # Packager that will be used to package your external modules
+#    includeModules: true # Node modules configuration for packaging
 
 provider:
   name: aws
@@ -54,3 +57,12 @@ functions:
           method: get
           path: products/{productId}
           cors: true
+  createProduct:
+    handler: src/createProductHandler.createProduct
+    events:
+      - http:
+          method: post
+          path: products
+          cors: true
+
+
