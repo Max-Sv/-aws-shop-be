@@ -1,36 +1,28 @@
-import {APIGatewayProxyEvent, APIGatewayProxyHandler} from "aws-lambda";
-import { Client, ClientConfig } from "pg";
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
+import {IProductItem} from "./models/product";
+import {findProductById} from "./services/db-client";
 
+export const getProductById = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    console.log(`getProductById: ${JSON.stringify(event)}`);
 
-export const getProductById: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent) => {
     const param = event.pathParameters;
-    const client = new Client(dbOptions);
-    await client.connect();
 
-    if (param) {
+    if (param && param.productId) {
         try {
-            const { rows: product } = await client.query(`SELECT * FROM products WHERE id='${param.productId}'`)
-            console.log("=>(getProductByIdHandler.ts:26) product", product);
+            const product: IProductItem[] = await findProductById(param.productId);
 
             return {
                 statusCode: 200,
                 body: JSON.stringify(product),
                 headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
             }
-        } catch (e) {
+        } catch (error) {
             return {
-                statusCode: 500,
-                body: JSON.stringify(e.message),
-                headers: {
-                    "Access-Control-Allow-Headers" : "Content-Type",
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-                },
-            }
+                statusCode: error.statusCode || 500,
+                body: JSON.stringify(error.message),
+            };
         }
     }
 
@@ -38,6 +30,7 @@ export const getProductById: APIGatewayProxyHandler = async (event: APIGatewayPr
         statusCode: 404,
         body: JSON.stringify({ error: "invalid path parameters"})
     }
+
 
 }
 

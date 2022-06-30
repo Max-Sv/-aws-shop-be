@@ -1,35 +1,26 @@
-import {APIGatewayProxyHandler} from "aws-lambda";
-import { Client, ClientConfig } from "pg";
+import {APIGatewayProxyEvent,  APIGatewayProxyResult} from "aws-lambda";
+import {IProductItem} from "./models/product";
+import {findAllProducts} from "./services/db-client";
 
-export const getProductsList: APIGatewayProxyHandler = async () => {
-    const client = new Client(dbOptions);
-    await client.connect();
+export const getProductsList = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     try {
-        const { rows: products } = await client.query(`select products.id, products.title, products.description, products.price, stocks.count  from products left join stocks on products.id = stocks.product_id`)
-        console.log("=>(getProductsListHandler.ts:22) products", products);
+        console.log(`getProductsList: ${JSON.stringify(event)}`);
+
+        const products: IProductItem[] = await findAllProducts();
 
         return {
             statusCode: 200,
             body: JSON.stringify(products),
             headers: {
-                "Access-Control-Allow-Headers" : "Content-Type",
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
             },
         }
-    } catch (err) {
+    } catch (error) {
         return {
-            statusCode: 500,
-            body: JSON.stringify(err),
-            headers: {
-                "Access-Control-Allow-Headers" : "Content-Type",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-            },
-        }
-    } finally {
-        await client.end()
+            statusCode: error.statusCode || 500,
+            body: JSON.stringify(error.message),
+        };
     }
 }
 
