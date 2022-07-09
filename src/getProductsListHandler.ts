@@ -1,15 +1,26 @@
-import {APIGatewayProxyHandler} from "aws-lambda";
-import { getMockProductItems$ } from "../utils/helpers";
+import {APIGatewayProxyEvent,  APIGatewayProxyResult} from "aws-lambda";
+import {IProductItem} from "./models/product";
+import {findAllProducts} from "./services/db-client";
 
-export const getProductsList: APIGatewayProxyHandler = async () => {
-    const items = await getMockProductItems$();
-    return {
-        statusCode: 200,
-        body: JSON.stringify(items),
-        headers: {
-            "Access-Control-Allow-Headers" : "Content-Type",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
+export const getProductsList = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+    try {
+        console.log(`getProductsList: ${JSON.stringify(event)}`);
+
+        const products: IProductItem[] = await findAllProducts();
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify(products),
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
+        }
+    } catch (error) {
+        return {
+            statusCode: error.statusCode || 500,
+            body: JSON.stringify(error.message),
+        };
     }
 }
+
