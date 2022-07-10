@@ -22,7 +22,6 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-webpack # serverless webpack plugin
-  - serverless-dotenv-plugin
 
 package:
   individually: true # to package functions individually. You can toggle this and check the difference webpack generates
@@ -30,26 +29,14 @@ package:
 custom:
   webpack: # serverless-webpack plugin options
     webpackConfig: webpack.config.js # Name of webpack configuration file
-    includeModules:
-      forceInclude:
-        - pg
+    includeModules: true # Node modules configuration for packaging
     packager: 'yarn' # Packager that will be used to package your external modules
-#    includeModules: true # Node modules configuration for packaging
-
-useDotenv: true
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
   region: eu-west-1
-  environment:
-    PG_HOST: ${env:PG_HOST}
-    PG_PORT: ${env:PG_PORT}
-    PG_DATABASE: ${env:PG_DATABASE}
-    PG_USERNAME: ${env:PG_USERNAME}
-    PG_PASSWORD: ${env:PG_PASSWORD}
-
 
 
 functions:
@@ -67,12 +54,3 @@ functions:
           method: get
           path: products/{productId}
           cors: true
-  createProduct:
-    handler: src/createProductHandler.createProduct
-    events:
-      - http:
-          method: post
-          path: products
-          cors: true
-
-

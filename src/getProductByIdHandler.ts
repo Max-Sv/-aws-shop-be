@@ -1,28 +1,32 @@
-import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import {IProductItem} from "./models/product";
-import {findProductById} from "./services/db-client";
+import {APIGatewayProxyHandler} from "aws-lambda";
+import {getMockProductItemById$} from "../utils/helpers";
 
-export const getProductById = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    console.log(`getProductById: ${JSON.stringify(event)}`);
 
+export const getProductById: APIGatewayProxyHandler = async (event) => {
     const param = event.pathParameters;
 
-    if (param && param.productId) {
+    if (param) {
         try {
-            const product: IProductItem[] = await findProductById(param.productId);
-
+            const item = await getMockProductItemById$(param.productId as string);
             return {
                 statusCode: 200,
-                body: JSON.stringify(product),
+                body: JSON.stringify(item),
                 headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
                     "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
                 },
             }
-        } catch (error) {
+        } catch (e) {
             return {
-                statusCode: error.statusCode || 500,
-                body: JSON.stringify(error.message),
-            };
+                statusCode: 404,
+                body: JSON.stringify(e.message),
+                headers: {
+                    "Access-Control-Allow-Headers" : "Content-Type",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+                },
+            }
         }
     }
 
@@ -30,7 +34,6 @@ export const getProductById = async (event: APIGatewayProxyEvent): Promise<APIGa
         statusCode: 404,
         body: JSON.stringify({ error: "invalid path parameters"})
     }
-
 
 }
 
