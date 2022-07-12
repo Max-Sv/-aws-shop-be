@@ -25,16 +25,15 @@ export const importProductsFile = async (event: any) => {
       ContentType: 'text/csv',
     };
 
-    const signedUrl = s3.getSignedUrl('putObject', params);
-    // const signedUrl = await new Promise((resolve, reject) => {
-    //   s3.getSignedUrl('putObject', params, (err, url) => {
-    //     if (err) {
-    //       reject(err)
-    //     }
-    //
-    //     resolve(url);
-    //   });
-    // });
+    const signedUrl = await new Promise((resolve, reject) => {
+      s3.getSignedUrl('putObject', params, (err, url) => {
+        if (err) {
+          reject(err)
+        }
+
+        resolve(url);
+      });
+    });
 
     return {
       statusCode: 201,
