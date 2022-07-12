@@ -21,33 +21,36 @@ export const importProductsFile = async (event: any) => {
     const params = {
       Bucket: BUCKET,
       Key: `uploaded/${name}`,
-      Expires: 60,
+      Expires: 1000,
       ContentType: 'text/csv',
     };
 
-    const signedUrl = await new Promise((resolve, reject) => {
-      s3.getSignedUrl('putObject', params, (err, url) => {
-        if (err) {
-          reject(err)
-        }
-
-        resolve(url);
-      });
-    });
+    const signedUrl = s3.getSignedUrl('putObject', params);
+    // const signedUrl = await new Promise((resolve, reject) => {
+    //   s3.getSignedUrl('putObject', params, (err, url) => {
+    //     if (err) {
+    //       reject(err)
+    //     }
+    //
+    //     resolve(url);
+    //   });
+    // });
 
     return {
       statusCode: 201,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        'Access-Control-Allow-Origin': 'https://d2sqr7ze13s3vc.cloudfront.net',
+        'Access-Control-Allow-Credentials': true,
       },
-
       body: JSON.stringify(signedUrl),
     };
   } catch (error) {
 
     return {
       statusCode: error.statusCode || 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify(error.message),
     };
   }

@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk';
 import csv from 'csv-parser';
 import {REGION,  BUCKET} from './constants';
-import {FileOperationError, ParseFileError} from "./utils/errors";
+import {FileOperationError, ParseFileError, QueueError} from "./utils/errors";
 
 const getFileStreams = async (records: any) => {
   const awsS3 = new AWS.S3({ region: REGION });
@@ -53,11 +53,29 @@ const getParsedRecords = async (records: any): Promise<any> => {
   });
 };
 
+const getQueue = async (parsedStreams) => {
+  const awsSqs = new AWS.SQS({ region: REGION });
+
+  return parsedStreams.map(async (stream) => {
+    console.log("=>(importFileParser.ts:69) stream", stream);
+    const params = {
+      QueueUrl: process.env.SQS_URL,
+      MessageBody: JSON.stringify(stream),
+      DelaySeconds: 0,
+    };
+    return await awsSqs.sendMessage(params).promise();
+  });
+
+};
+
 const throwParseFileError = (error: Error) => {
   throw new ParseFileError(error.message);
 }
 const throwFileOperationError = (error: Error) => {
   throw new FileOperationError(error.message);
+}
+const throwQueueError = (error: Error) => {
+  throw new QueueError(error.message);
 }
 
 export const importFileParser = async (event: any) => {
@@ -81,10 +99,18 @@ export const importFileParser = async (event: any) => {
       throwFileOperationError(error.message);
     }
 
+    try {
+      const queue$ = await getQueue(parsedStreams);
+      await Promise.all(queue$);
+    } catch (error) {
+      throwQueueError(error.message)
+    }
+
     return {
       statusCode: 200,
       headers: {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': 'https://d2sqr7ze13s3vc.cloudfront.net',
+        'Access-Control-Allow-Credentials': true,
       },
       body: JSON.stringify(parsedStreams),
     };
