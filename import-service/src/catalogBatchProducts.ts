@@ -9,8 +9,8 @@ export const notifyAddProducts = async (postedProducts: IProductItem[]) => {
   const promises = postedProducts.map(product => {
     return sns.publish({
       TopicArn: process.env.SNS_TOPIC_ARN,
-      Subject: `Product added: ${product.title}(id: ${ product.id })`,
-      Message: `Product with title "${ product.title }"(id: ${ product.id }) added successfully`,
+      Subject: `Product added: ${product.title}`,
+      Message: `Product with title "${ product.title }" added successfully`,
       MessageAttributes: {
         title: {
           DataType: 'String',

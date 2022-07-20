@@ -54,4 +54,3 @@ export const importProductsFile = async (event: any) => {
     };
   }
 };
-
