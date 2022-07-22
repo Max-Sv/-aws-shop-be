@@ -24,26 +24,30 @@ export const importProductsFile = async (event: any) => {
       Expires: 1000,
       ContentType: 'text/csv',
     };
+    console.log("=>(importProductsFile.ts:27) params", params);
 
     const signedUrl = await new Promise((resolve, reject) => {
       s3.getSignedUrl('putObject', params, (err, url) => {
         if (err) {
+          console.log("=>(importProductsFile.ts:30) err", err);
+
           reject(err)
         }
 
         resolve(url);
       });
     });
+    console.log("=>(importProductsFile.ts:40) signedUrl", signedUrl);
 
     return {
       statusCode: 201,
       headers: {
-        'Access-Control-Allow-Origin': 'https://d2sqr7ze13s3vc.cloudfront.net',
-        'Access-Control-Allow-Credentials': true,
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify(signedUrl),
     };
   } catch (error) {
+    console.log("=>(importProductsFile.ts:59) error", error);
 
     return {
       statusCode: error.statusCode || 500,
