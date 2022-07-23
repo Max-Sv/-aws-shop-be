@@ -12,6 +12,7 @@
 # Happy Coding!
 plugins:
   - serverless-webpack # serverless webpack plugin
+  - serverless-dotenv-plugin
 
 package:
   individually: true # to package functions individually. You can toggle this and check the difference webpack generates
@@ -22,6 +23,7 @@ custom:
     includeModules: true # Node modules configuration for packaging
     packager: 'npm' # Packager that will be used to package your external modules
 #    packager: 'yarn' # Packager that will be used to package your external modules
+useDotenv: true
 
 service: import-service
 # app and org for use with dashboard.serverless.com
@@ -39,10 +41,26 @@ provider:
   region: eu-west-1
 
   iamRoleStatements:
-    - Effect: Allow
-      Action: s3:*
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
       Resource:
-        - arn:aws:s3:::app-products-import
+        - "arn:aws:s3:::app-products-import/*"
+        - "arn:aws:s3:::app-products-import"
+    - Effect: Allow
+      Action: sqs:*
+      Resource:
+        Fn::GetAtt: [ SQSQueue, Arn ]
+    - Effect: Allow
+      Action: sns:*
+      Resource:
+        Ref: SNSTopic
+
+  environment:
+    SQS_URL:
+      Ref: SQSQueue
+    SNS_TOPIC_ARN:
+      Ref: SNSTopic
 
 functions:
   importProductsFile:
@@ -51,6 +69,11 @@ functions:
       - http:
           path: 'import/'
           method: get
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                name: true
   importFileParser:
     handler: src/importFileParser.importFileParser
     events:
@@ -60,4 +83,42 @@ functions:
           rules:
             - prefix: uploaded/
           existing: true
+  catalogBatchProcess:
+    handler: src/catalogBatchProducts.catalogBatchProducts
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - SQSQueue
+              - Arn
+
+resources:
+  Resources:
+    SQSQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: app-products-queue
+    SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: app-products-topic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: maximsvilenok@gmail.com
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+    SNSSubscriptionError:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: mlalx@tut.by
+        Protocol: email
+        TopicArn:
+          Ref: SNSTopic
+        FilterPolicy:
+          errorMail:
+            - true
+
 

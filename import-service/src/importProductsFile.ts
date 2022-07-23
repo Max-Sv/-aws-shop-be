@@ -21,7 +21,7 @@ export const importProductsFile = async (event: any) => {
     const params = {
       Bucket: BUCKET,
       Key: `uploaded/${name}`,
-      Expires: 60,
+      Expires: 1000,
       ContentType: 'text/csv',
     };
 
@@ -38,16 +38,18 @@ export const importProductsFile = async (event: any) => {
     return {
       statusCode: 201,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        'Access-Control-Allow-Origin': 'https://d2sqr7ze13s3vc.cloudfront.net',
+        'Access-Control-Allow-Credentials': true,
       },
-
       body: JSON.stringify(signedUrl),
     };
   } catch (error) {
 
     return {
       statusCode: error.statusCode || 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify(error.message),
     };
   }
