@@ -1,15 +1,9 @@
-import { ALLOW, DENY, UNAUTHORIZED, TOKEN } from './constants';
+import { ALLOW, DENY, UNAUTHORIZED } from './constants';
 
 export const basicAuthorizer = (event: any, _: any, cb: any) => {
-  console.log('Authorizer event', JSON.stringify(event, null, 2));
+  console.log("=>(basicAuthorizer.ts:37) event", event);
 
-  // const authorizationToken = event.authorizationToken;
-  //
-  // if (event.type !== TOKEN || !token) {
-  //   cb(UNAUTHORIZED, TOKEN_ERROR_MESSAGE);
-  // }
-
-  if (event.type !== TOKEN) {
+  if (event.type !== 'TOKEN') {
     cb(UNAUTHORIZED);
   }
 
@@ -19,27 +13,20 @@ export const basicAuthorizer = (event: any, _: any, cb: any) => {
     const buff = Buffer.from(encodedCreds, 'base64');
     const plainCreds = buff.toString('utf-8').split(':');
     const [userName, password] = plainCreds
+
     console.log("=>(basicAuthorizer.ts:23) password", password);
     console.log("=>(basicAuthorizer.ts:23) userName", userName);
+
     const storedUserPassword = process.env[userName];
     const effect = !storedUserPassword || storedUserPassword !== password ? DENY : ALLOW;
     const policy = generatePolicy(encodedCreds, effect, event.methodArn);
+
     cb(null, policy);
   } catch (error) {
     console.log("=>(basicAuthorizer.ts:42) error", error);
-
     cb(UNAUTHORIZED, error.message);
   }
 
-
-  // const [userName, password] = decodeToken(token);
-  // console.log(`User name: ${userName} Password: ${password}`);
-  // const isValid = userName && password && process.env[userName] === password;
-  //
-  // const effect = isValid ? ALLOW : DENY;
-  // const policy = generatePolicy(userName, effect, event.methodArn);
-  //
-  // return cb(null, policy);
 };
 
 const generatePolicy = (principalId: string, effect: string = ALLOW, resource: string) => {

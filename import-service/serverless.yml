@@ -69,13 +69,17 @@ functions:
       - http:
           path: 'import/'
           method: get
-          cors: true
           authorizer:
             name: tokenAuthorizer
             arn: arn:aws:lambda:eu-west-1:499107229445:function:authorization-service-dev-basicAuthorizer
             resultTtlInSeconds: 0
             identitySource: method.request.header.Authorization
             type: token
+          cors:
+            origins:
+              - https://d2sqr7ze13s3vc.cloudfront.net
+            methods:
+              - GET
   importFileParser:
     handler: src/importFileParser.importFileParser
     events:
@@ -122,3 +126,14 @@ resources:
         FilterPolicy:
           errorMail:
             - true
+
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'https://d2sqr7ze13s3vc.cloudfront.net'"
+          gatewayresponse.header.Access-Control-Allow-Credentials: "'true'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
