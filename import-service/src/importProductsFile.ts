@@ -30,7 +30,6 @@ export const importProductsFile = async (event: any) => {
         if (err) {
           reject(err)
         }
-
         resolve(url);
       });
     });
@@ -54,4 +53,3 @@ export const importProductsFile = async (event: any) => {
     };
   }
 };
-

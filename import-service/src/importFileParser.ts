@@ -57,7 +57,6 @@ const getQueue = async (parsedStreams) => {
   const awsSqs = new AWS.SQS({ region: REGION });
 
   return parsedStreams.map(async (stream) => {
-    console.log("=>(importFileParser.ts:69) stream", stream);
     const params = {
       QueueUrl: process.env.SQS_URL,
       MessageBody: JSON.stringify(stream),
@@ -87,7 +86,6 @@ export const importFileParser = async (event: any) => {
 
     try {
       parsedStreams = await Promise.all(await getParsedStreams(streams$));
-      console.log("=>(importFileParser.ts:124) parsedStreams", parsedStreams);
     } catch (error) {
       throwParseFileError(error);
     }
