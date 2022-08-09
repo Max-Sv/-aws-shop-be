@@ -1,7 +1,7 @@
 import { ALLOW, DENY, UNAUTHORIZED } from './constants';
 
 export const basicAuthorizer = (event: any, _: any, cb: any) => {
-  console.log("=>(basicAuthorizer.ts:37) event", event);
+  console.log("event", event);
 
   if (event.type !== 'TOKEN') {
     cb(UNAUTHORIZED);
