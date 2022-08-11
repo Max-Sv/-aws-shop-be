@@ -20,7 +20,7 @@ let AppService = class AppService {
         this.cacheManager = cacheManager;
     }
     setCache(data) {
-        this.cacheManager.set(app_controller_1.PRODUCT_REQ, data, { ttl: 120 }).then(console.log);
+        this.cacheManager.set(app_controller_1.PRODUCT_REQ, data, { ttl: 120 }).then(() => console.log('Products list saved in cache'));
     }
     async getCache() {
         return await this.cacheManager.get(app_controller_1.PRODUCT_REQ);
